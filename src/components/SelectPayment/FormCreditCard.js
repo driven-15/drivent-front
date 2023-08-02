@@ -8,15 +8,14 @@ import Button from '../Form/Button';
 
 import 'react-credit-cards-2/dist/es/styles-compiled.css';
 
-export default function FormCreditCard() {
-  const [state, setState] = useState({
+export default function FormCreditCard({ setIsPaid }) {
+  const [formData, setFormData] = useState({
     number: '',
     name: '',
     expiry: '',
     cvc: '',
     issuer: '',
     focused: '',
-    formData: null,
   });
   const [validity, setValidity] = useState({
     number: null,
@@ -26,8 +25,8 @@ export default function FormCreditCard() {
   });
 
   const handleCallback = ({ issuer }, isValid) => {
-    if (isValid && issuer !== state.issuer) {
-      setState((prev) => ({ ...prev, issuer }));
+    if (isValid && issuer !== formData.issuer) {
+      setFormData((prev) => ({ ...prev, issuer }));
     }
   };
 
@@ -90,34 +89,27 @@ export default function FormCreditCard() {
       setValidity((prev) => ({ ...prev, name: isValid }));
     }
 
-    setState((prev) => ({ ...prev, [name]: finalValue }));
+    setFormData((prev) => ({ ...prev, [name]: finalValue }));
   };
 
   const handleInputFocus = (evt) => {
-    setState((prev) => ({ ...prev, focused: evt.target.name }));
+    setFormData((prev) => ({ ...prev, focused: evt.target.name }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = [...e.target.elements]
-      .filter((d) => d.name)
-      .reduce((acc, d) => {
-        acc[d.name] = d.value;
-        return acc;
-      }, {});
-
-    setState((prev) => ({ ...prev, formData }));
+    setIsPaid(true);
   };
 
   return (
     <Wrapper>
       <WrapperForm>
         <Cards
-          number={state.number}
-          expiry={state.expiry}
-          cvc={state.cvc}
-          name={state.name}
-          focused={state.focused}
+          number={formData.number}
+          expiry={formData.expiry}
+          cvc={formData.cvc}
+          name={formData.name}
+          focused={formData.focused}
           callback={handleCallback}
         />
         <Form onSubmit={handleSubmit}>
@@ -129,7 +121,7 @@ export default function FormCreditCard() {
                 placeholder="Card Number"
                 pattern="[\d| ]{16}"
                 required
-                value={state.number}
+                value={formData.number}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
               />
@@ -144,7 +136,7 @@ export default function FormCreditCard() {
                 name="name"
                 placeholder="Name"
                 required
-                value={state.name}
+                value={formData.name}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
               />
@@ -161,7 +153,7 @@ export default function FormCreditCard() {
                 placeholder="Valid Thru"
                 pattern="\d\d/\d\d"
                 required
-                value={state.expiry}
+                value={formData.expiry}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
               />
@@ -176,20 +168,21 @@ export default function FormCreditCard() {
                 placeholder="CVC"
                 pattern="\d{3,4}"
                 required
-                value={state.cvc}
+                value={formData.cvc}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
               />
               {validity.cvc && <ValidIcon />}
             </WrapperInput>
           </Row>
-          <input type="hidden" name="issuer" value={state.issuer} />
+          <input type="hidden" name="issuer" value={formData.issuer} />
         </Form>
       </WrapperForm>
 
       <SubmitContainer>
         <Button
           type="submit"
+          onClick={handleSubmit}
           // disabled={dynamicInputIsLoading || saveEnrollmentLoading}
         >
             Finalizar pagamento
