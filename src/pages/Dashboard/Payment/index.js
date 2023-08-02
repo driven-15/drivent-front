@@ -1,3 +1,5 @@
+import FormCreditCard from '../../../components/FormCreditCard';
+
 export default function Payment() {
-  return 'Pagamento: Em breve!';
+  return <FormCreditCard />;
 }
