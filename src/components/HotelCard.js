@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
-export default function HotelCard({ width, height, handleClick, isClickable, image, title, types, places }) {
+export default function HotelCard({ width, height, handleClick, isClickable, image, title, types, places, type }) {
   return (
     <Wrapper
+      type={type}
       width={width}
       height={height}
       onClick={isClickable && handleClick}
@@ -22,30 +23,39 @@ const Wrapper = styled.button`
   height: ${({ height }) => height};
   align-items: center;
   justify-content: center;
-  border: ${({ type }) => (type === 'primary' ? 'none' : '1px solid rgba(206, 206, 206, 1)')};
-  border-radius: 20px;
-  background-color: ${({ type }) => (type === 'primary' ? 'rgba(255, 238, 210, 1)' : 'transparent')};
+  border-radius: 10px;
+  background-color: ${({ type }) => (type === 'primary' ? '#EBEBEB' : '#FFEED2')};
+  border: none;
+  padding: 9px;
 `;
 
 const Image = styled.img`
-  width: ${({ width }) => width};
-  border-radius: 15px;
+  width: 168px;
+  height: 109px;
+  border-radius: 5px;
+  margin: 5px;
 `;
 
 const Title = styled.p`
-  font-size: 16px;
-  color: rgba(69, 69, 69, 1);
+  font-size: 20px;
+  font-weight: 400;
+  text-align: left;
+  color: #343434;
+  margin: 5px;
 `;
 
 const Subtitle = styled.p`
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgba(137, 137, 137, 1);
+  font-size: 12px;
+  font-weight: 700;
+  color: #3C3C3C;
+  text-align: left;
+  margin: 12px 5px 3px 5px;
 `;
 
 const Description = styled.p`
-  margin-top: 8px;
   font-size: 12px;
-  color: rgba(137, 137, 137, 1);
+  font-weight: 400;
+  color: #3C3C3C;
+  text-align: left;
+  margin: 3px 5px;
 `;
