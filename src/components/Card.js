@@ -6,7 +6,7 @@ export default function Card({ type, width, height, handleClick, isClickable, ti
       type={type}
       width={width}
       height={height}
-      onClick={isClickable && handleClick}
+      onClick={isClickable ? handleClick : undefined}
     >
       <Title>{title}</Title>
       <Subtitle>{subtitle}</Subtitle>
