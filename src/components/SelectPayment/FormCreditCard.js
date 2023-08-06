@@ -6,9 +6,13 @@ import Cards from 'react-credit-cards-2';
 import { clearNumber, formatCreditCardNumber, formatCVC, formatExpirationDate } from './utils';
 import Button from '../Form/Button';
 
-import 'react-credit-cards-2/dist/es/styles-compiled.css';
+import * as paymentApi from '../../services/paymentApi';
 
-export default function FormCreditCard({ setIsPaid }) {
+import 'react-credit-cards-2/dist/es/styles-compiled.css';
+import { toast } from 'react-toastify';
+import useToken from '../../hooks/useToken';
+
+export default function FormCreditCard({ setIsPaid, ticketId }) {
   const [formData, setFormData] = useState({
     number: '',
     name: '',
@@ -23,10 +27,14 @@ export default function FormCreditCard({ setIsPaid }) {
     expiry: null,
     cvc: null,
   });
+  const [cardIssuer, setCardIssuer] = useState('');
+
+  const token = useToken();
 
   const handleCallback = ({ issuer }, isValid) => {
+    setCardIssuer(issuer.toUpperCase());
     if (isValid && issuer !== formData.issuer) {
-      setFormData((prev) => ({ ...prev, issuer }));
+      setFormData((prev) => ({ ...prev, issuer: issuer }));
     }
   };
 
@@ -96,10 +104,40 @@ export default function FormCreditCard({ setIsPaid }) {
     setFormData((prev) => ({ ...prev, focused: evt.target.name }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    setIsPaid(true);
+
+    const body = {
+      ticketId,
+      cardData: {
+        issuer: cardIssuer,
+        number: formData.number,
+        name: formData.name,
+        expirationDate: formData.expiry,
+        cvv: formData.cvc
+      }
+    };
+
+    try {
+      await paymentApi.payTicket(body, token);
+      setIsPaid(true);
+    } catch (error) {
+      return toast(error.message);
+    }
   };
+
+  const areAllValuesTrue = (obj) => {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (obj[key] !== true) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const formIsValid = areAllValuesTrue(validity);
 
   return (
     <Wrapper>
@@ -183,7 +221,7 @@ export default function FormCreditCard({ setIsPaid }) {
         <Button
           type="submit"
           onClick={handleSubmit}
-          // disabled={dynamicInputIsLoading || saveEnrollmentLoading}
+          disabled={!formIsValid}
         >
             Finalizar pagamento
         </Button>

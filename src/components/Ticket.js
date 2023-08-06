@@ -9,7 +9,7 @@ import { getTicketTypes, submitTicketReservation } from '../services/ticketsApi'
 import { useEffect } from 'react';
 import useToken from '../hooks/useToken';
 
-export default function Ticket({ setCurrentStage }) {
+export default function Ticket({ setCurrentStage, setTicket }) {
   const [enrollment, setEnrollment] = useState(null);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState({ id: null, name: '' });
@@ -52,9 +52,10 @@ export default function Ticket({ setCurrentStage }) {
 
   async function handleSubmit(ticketTypeId) {
     try {
-      await submitTicketReservation(token, ticketTypeId);
+      const response = await submitTicketReservation(token, ticketTypeId);
+      setTicket(response);
       toast('Ingresso reservado!');
-      setCurrentStage(2);
+      setCurrentStage(3);
     } catch (err) {
       console.log(err);
     }

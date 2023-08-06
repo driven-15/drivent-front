@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 
@@ -6,8 +6,18 @@ import FormCreditCard from './FormCreditCard';
 import Success from './Success';
 import Card from '../Card';
 
-export default function SelectPayment() {
+export default function SelectPayment({ ticket }) {
   const [isPaid, setIsPaid] = useState(false);
+
+  useEffect(() => {
+    if (ticket.status === 'PAID') {
+      setIsPaid(true);
+    } else {
+      setIsPaid(false);
+    }
+  }, [ticket]);
+
+  const messageHotelTitle = ticket.TicketType.includesHotel ? 'Com Hotel' : 'Sem Hotel';
 
   return (
     <div>
@@ -18,15 +28,15 @@ export default function SelectPayment() {
         type={'primary'}
         width='290px'
         height='108px'
-        title='Presencial + Com Hotel'
-        subtitle='R$ 600'
+        title={ticket.TicketType.isRemote ? 'Online' : ` Presencial + ${messageHotelTitle}`}
+        subtitle={`R$ ${ticket.TicketType.price}`}
       />
 
       <WrapperCreditCard>
         <StyledTypography variant="h6" color="textSecondary">
         Pagamento
         </StyledTypography>
-        {isPaid ? <Success /> : <FormCreditCard setIsPaid={setIsPaid}/>}
+        {isPaid ? <Success /> : <FormCreditCard setIsPaid={setIsPaid} ticketId={ticket.id} />}
       </WrapperCreditCard>
     </div>
   );
