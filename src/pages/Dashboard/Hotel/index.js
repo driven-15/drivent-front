@@ -13,7 +13,6 @@ export default function Hotel() {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [allHotels, setAllHotels] = useState([]);
-  const [capacities, setCapacities] = useState([]);
   const [hotelRooms, setHotelRooms] = useState(null);
   const [isRemote, setIsRemote] = useState(true);
   const [payment, setPayment] = useState(false);
@@ -76,8 +75,9 @@ export default function Hotel() {
     }
   }
 
-  console.log(hotelRooms);
-  console.log(allHotels);
+  function handleSubmit(roomId) {
+    alert(roomId);
+  }
 
   return (
     <>
@@ -101,7 +101,7 @@ export default function Hotel() {
                 image = {hotel.image}
                 title = {hotel.name}
                 types='Single and Double'
-                places='103 vagas'
+                places={hotel.capacity._sum.capacity}
                 isClickable
                 handleClick={() => handleHotelID(hotel.id)}
               />
@@ -115,17 +115,24 @@ export default function Hotel() {
           <InputContainer2>
             { hotelRooms.Rooms.map( (room) => 
               <div key={room.id}>
+                {room.booking}
                 <RoomCard
                   type ={selectedRoom !== room.id ? 'primary' : 'secondary'}
                   width ='190px'
                   height ='45px'
                   room = {room}
+                  booking = {room.Booking}
                   isClickable
                   handleClick={() => handleRoomID(room.id)}
                 />
               </div>
             ) }
           </InputContainer2>
+          <SubmitContainer>
+            <Button type="submit" onClick={() => handleSubmit(selectedRoom)}>
+              RESERVAR QUARTO
+            </Button>
+          </SubmitContainer>
         </>
         }
       </>
@@ -151,3 +158,21 @@ const InputContainer2 = styled.div`
   margin-bottom: 34px!important;
   flex-wrap: wrap;
 `;
+
+const SubmitContainer = styled.div`
+  width: 100% !important;
+
+  > button {
+    margin-top: 0 !important;
+  }
+`;
+
+const Button = styled.button`
+  width: 182px;
+  height: 37px;
+  margin-top: 0 !important;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  border: none;
+`;
+
