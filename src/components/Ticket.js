@@ -17,6 +17,7 @@ export default function Ticket({ setCurrentStage, setTicket }) {
   const [ticketPrice, setTicketPrice] = useState(0);
   const [hotelPrice, setHotelPrice] = useState(0);
   const token = useToken();
+  const types = [];
 
   useEffect(() => {
     getEnrollment();
@@ -42,11 +43,22 @@ export default function Ticket({ setCurrentStage, setTicket }) {
   }
 
   function handleTicketType(id, name, price) {
+    if (name === 'Online') {
+      setHotelPrice(0);
+      setSelectedHotel(null);
+    }
     setSelectedTicket({ id, name });
     setTicketPrice(price);
   }
 
   function handleHotelType(hotel) {
+    if (hotel === 'withHotel' && selectedTicket.name === 'Presencial') {
+      const typeWithHotel = ticketTypes.find((type) => type.includesHotel === true);
+      setSelectedTicket({ id: typeWithHotel.id, name: 'Presencial' });
+      setHotelPrice(350);
+    } else {
+      setHotelPrice(0);
+    }
     setSelectedHotel(hotel);
   }
 
@@ -68,6 +80,8 @@ export default function Ticket({ setCurrentStage, setTicket }) {
       </StyledTypography>
       <InputContainer>
         {ticketTypes.map((ticket) => {
+          if (types.includes(ticket.name)) return null;
+          types.push(ticket.name);
           return (
             <Card
               key={ticket.id}
@@ -144,9 +158,9 @@ const Bold = styled.span`
 `;
 
 const SubmitContainer = styled.div`
-  width: 100%!important;
+  width: 100% !important;
 
   > button {
-  margin-top: 0 !important;
+    margin-top: 0 !important;
   }
 `;
