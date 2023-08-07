@@ -13,7 +13,7 @@ export default function RequirementPage({ message }) {
 }
 
 const StyledTypography = styled(Typography)`
-  width: 400px;
+  width: 500px;
   margin-bottom: 20px !important;
   text-align: center;
 `;

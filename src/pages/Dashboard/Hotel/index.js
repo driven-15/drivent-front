@@ -2,36 +2,81 @@ import styled from 'styled-components';
 import Typography from '@material-ui/core/Typography';
 import HotelCard from '../../../components/HotelCard';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import useToken from '../../../hooks/useToken';
+import { getHotelRooms, getHotelsList } from '../../../services/hotelsApi';
+import { toast } from 'react-toastify';
+import RequirementPage from '../../../components/RequirementPage';
+import { getTickets } from '../../../services/ticketsApi';
+import RoomCard from '../../../components/RoomCard';
 
 export default function Hotel() {
-  // enviar req pro banco e ver se a pessoa pode receber a lista de hoteis
-  // se nao puder exibo "Você precisa ter confirmado pagamento antes de fazer escolha da hospedagem"
-  // se o ingresso nao incluir hoteis exibo
-  // Sua modalidade de ingresso não inclui hospedagem, prossiga para a escolha de ativiades
-  // se estiver tudo ok exibo a lista de hoteis
-  // pegar os dados recebidos dos hoteis e exibir na tela
-
   const [selectedHotel, setSelectedHotel] = useState(null);
-  const [carregando, setCarregando] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [allHotels, setAllHotels] = useState([]);
+  const [hotelRooms, setHotelRooms] = useState(null);
+  const [isRemote, setIsRemote] = useState(true);
+  const [payment, setPayment] = useState(false);
   const token = useToken();
 
   useEffect(() => {
-    const headers = { Authorization: `Bearer ${token}` };
-    //setCarregando(true);
-    /* const promise = axios.get(`${process.env.REACT_APP_API_URL}/hotels`, headers);
-    promise.then(resposta => {
-      setCarregando(false);
-    });
-    promise.catch(erro => {
-      alert(erro.response.data);
-    }); */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    checkPayment();
+    getHotels();
   }, []);
 
-  function handleHotelID(hotel) {
-    selectedHotel === null ? setSelectedHotel(hotel) : setSelectedHotel(null);
+  async function getHotels() {
+    try {
+      const data = await getHotelsList(token);
+      setAllHotels(data);
+    } catch (err) {
+      toast('Não foi possível obter a lista de hoteis!');
+    }
+  }
+
+  async function checkPayment(hotelId) {
+    try {
+      const data = await getTickets(token);
+      if(data.status === 'PAID') {
+        setPayment(true);
+      } else {
+        toast('Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem');
+      }
+      if(data.TicketType.isRemote === false) {
+        setIsRemote(false);
+      }
+    } catch (err) {
+      toast('Não foi possível confirmar seu pagamento!');
+    }
+  }
+
+  async function getRooms(hotelId) {
+    try {
+      const data = await getHotelRooms(token, hotelId);
+      setHotelRooms(data);
+    } catch (err) {
+      toast('Não foi possível obter a lista de quartos!');
+    }
+  }
+
+  function handleHotelID(hotelId) {
+    if (selectedHotel === hotelId) {
+      setSelectedHotel(null);
+      setHotelRooms(null);
+    } else {
+      setSelectedHotel(hotelId);
+      getRooms(hotelId);
+    }
+  }
+
+  function handleRoomID(roomId) {
+    if (selectedRoom === roomId) {
+      setSelectedRoom(null);
+    } else {
+      setSelectedRoom(roomId);
+    }
+  }
+
+  function handleSubmit(roomId) {
+    alert(roomId);
   }
 
   return (
@@ -39,28 +84,64 @@ export default function Hotel() {
       <StyledTypography variant="h4">
         Escolha de hotel e quarto
       </StyledTypography>
-      <StyledTypography variant="h6" color="textSecondary">Primeiro, escolha seu hotel</StyledTypography>
-      <InputContainer>
-        {carregando === true ?
-          <Text>Carregando informações...</Text>
-          :
-          <HotelCard
-            type={selectedHotel !== 'hotelID' ? 'primary' : 'secondary'}
-            width='196px'
-            height='264px'
-            image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFRXI9g6dkIkzK_zh9H9MS2CpsPrjypfOa6PjMexOGDHM3qjvsFJyFN3yOe1XPPQubUfA&usqp=CAU"
-            title='Driven Resort'
-            types='Single and double'
-            places='103 vagas'
-            isClickable
-            handleClick={() => handleHotelID('hotelID')}
-          />
+      {payment === false ?  
+        <RequirementPage message="Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem" />
+        : isRemote === true ?  
+          <RequirementPage message="Sua modalidade de ingresso não inclui hospedagem. Prossiga para a escolha de atividades" />
+          : <StyledTypography variant="h6" color="textSecondary">Primeiro, escolha seu hotel</StyledTypography>}
+      { (payment === true && isRemote === false) && 
+      <>
+        <InputContainer>
+          { allHotels.map( (hotel) => 
+            <div key={hotel.id}>
+              <HotelCard
+                type ={selectedHotel !== hotel.id ? 'primary' : 'secondary'}
+                width ='196px'
+                height ='264px'
+                image = {hotel.image}
+                title = {hotel.name}
+                types='Single and Double'
+                places={hotel.capacity._sum.capacity}
+                isClickable
+                handleClick={() => handleHotelID(hotel.id)}
+              />
+            </div>
+          ) }
+        </InputContainer>
+        
+        { (payment === true && isRemote === false && hotelRooms !== null) && 
+        <>
+          <StyledTypography variant="h6" color="textSecondary">Ótima pedida! Agora escolha seu quarto</StyledTypography>
+          <InputContainer2>
+            { hotelRooms.Rooms.map( (room) => 
+              <div key={room.id}>
+                {room.booking}
+                <RoomCard
+                  type ={selectedRoom !== room.id ? 'primary' : 'secondary'}
+                  width ='190px'
+                  height ='45px'
+                  room = {room}
+                  booking = {room.Booking}
+                  isClickable
+                  handleClick={() => handleRoomID(room.id)}
+                />
+              </div>
+            ) }
+          </InputContainer2>
+          <SubmitContainer>
+            <Button type="submit" onClick={() => handleSubmit(selectedRoom)}>
+              RESERVAR QUARTO
+            </Button>
+          </SubmitContainer>
+        </>
         }
-      </InputContainer>
+      </>
+      }
     </>
   );
 }
 
+// no back contar todos os bookings e todos as capacities
 const StyledTypography = styled(Typography)`
   margin-bottom: 20px!important;
 `;
@@ -71,14 +152,27 @@ const InputContainer = styled.div`
   margin-bottom: 34px!important;
 `;
 
-const Text = styled.div`
-  margin: auto;
-  margin-top: 25%;
-  font-family: Roboto;
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 23px;
-  letter-spacing: 0em;
-  text-align: center;
-  color:  #8E8E8E;
+const InputContainer2 = styled.div`
+  display: flex;
+  gap: 24px;
+  margin-bottom: 34px!important;
+  flex-wrap: wrap;
 `;
+
+const SubmitContainer = styled.div`
+  width: 100% !important;
+
+  > button {
+    margin-top: 0 !important;
+  }
+`;
+
+const Button = styled.button`
+  width: 182px;
+  height: 37px;
+  margin-top: 0 !important;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  border: none;
+`;
+
