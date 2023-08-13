@@ -1,19 +1,19 @@
 import styled from 'styled-components';
 
-export default function HotelCard({ width, height, handleClick, isClickable, image, title, types, places, type }) {
+export default function HotelCard({ width, height, handleClick, isClickable, image, title, firstSubtitle, firstValue, secondSubtitle, secondValue, type }) {
   return (
     <Wrapper
       type={type}
       width={width}
       height={height}
-      onClick={isClickable && handleClick}
+      onClick={isClickable ? handleClick : undefined}
     >
       <Image src={image} alt="foto hotel"/>
       <Title>{title}</Title>
-      <Subtitle>Tipos de Acomodação:</Subtitle>
-      <Description>{types}</Description>
-      <Subtitle>Vagas disponíveis:</Subtitle>
-      <Description>{places}</Description>
+      <Subtitle>{firstSubtitle}</Subtitle>
+      <Description>{firstValue}</Description>
+      <Subtitle>{secondSubtitle}</Subtitle>
+      <Description>{secondValue}</Description>
     </Wrapper>
   );
 }
