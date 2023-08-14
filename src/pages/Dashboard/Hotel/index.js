@@ -23,7 +23,6 @@ export default function Hotel() {
 
   useEffect(() => {
     checkPayment();
-    getHotels();
   }, []);
 
   async function getHotels() {
@@ -45,6 +44,7 @@ export default function Hotel() {
       }
       if (data.TicketType.isRemote === false) {
         setIsRemote(false);
+        getHotels();
       }
     } catch (err) {
       toast('Não foi possível confirmar seu pagamento!');
@@ -92,7 +92,7 @@ export default function Hotel() {
       setSelectedRoom(roomId);
     }
   }
-
+  
   async function handleSubmit(roomId) {
     try {
       if (booking) {
@@ -122,9 +122,9 @@ export default function Hotel() {
       {!hasBooking ? (
         <>
           {payment === false ? (
-            <RequirementPage message="Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem" />
+            <RequirementPage message="Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem." />
           ) : isRemote === true ? (
-            <RequirementPage message="Sua modalidade de ingresso não inclui hospedagem. Prossiga para a escolha de atividades" />
+            <RequirementPage message="Sua modalidade de ingresso não inclui hospedagem. Prossiga para a escolha de atividades." />
           ) : (
             <StyledTypography variant="h6" color="textSecondary">
               Primeiro, escolha seu hotel
