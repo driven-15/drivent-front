@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import useToken from '../hooks/useToken';
 
 export default function Ticket({ setCurrentStage, setTicket }) {
-  const [enrollment, setEnrollment] = useState(null);
+  const [, setEnrollment] = useState(null);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState({ id: null, name: '' });
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -38,7 +38,7 @@ export default function Ticket({ setCurrentStage, setTicket }) {
       const data = await getTicketTypes(token);
       setTicketTypes(data);
     } catch (err) {
-      console.log(err);
+      toast('Não foi possível obeter as informacoes do seu ticket!');
     }
   }
 
@@ -69,7 +69,7 @@ export default function Ticket({ setCurrentStage, setTicket }) {
       toast('Ingresso reservado!');
       setCurrentStage(3);
     } catch (err) {
-      console.log(err);
+      toast('Não foi possível reservar seu ingresso!');
     }
   }
 

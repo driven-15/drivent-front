@@ -4,16 +4,17 @@ import full from '../assets/images/full.svg';
 import selected from '../assets/images/pink.svg';
 import unavailable from '../assets/images/gray.svg';
 
-export default function RoomCard({ width, height, handleClick, isClickable, room, booking, type }) {
+export default function RoomCard({ width, height, handleClick, room, booking, type }) {
   return (
     <>
       <Wrapper
-        type={type}
+        type={room.capacity === booking.length ? 'tertiary' : type}
         width={width}
         height={height}
-        onClick={isClickable && handleClick}
+        disabled={room.capacity === booking.length}
+        onClick={handleClick}
       >
-        <Title>{room.capacity}</Title>
+        <Title type={room.capacity === booking.length ? 'tertiary' : type}>{room.name}</Title>
         {room.capacity === 1 ?
           <div>
             { type === 'secondary' ?
@@ -55,7 +56,6 @@ export default function RoomCard({ width, height, handleClick, isClickable, room
         }
       </Wrapper>
     </>
- 
   );
 }
 //se quarto ta cheio coloco em cinza
@@ -67,8 +67,8 @@ const Wrapper = styled.button`
   align-items: center;
   justify-content: space-between;
   border-radius: 10px;
-  background-color: ${({ type }) => (type === 'primary' ? 'transparent' : '#FFEED2')};
-  border: 1px solid #CECECE;
+  background-color: ${({ type }) => (type === 'primary' ? 'transparent' : type === 'tertiary' ? '#E9E9E9' : '#FFEED2')};
+  border: 1px solid #cecece;
   padding: 9px 15px;
   display: flex;
 `;
@@ -78,7 +78,7 @@ const Title = styled.p`
   font-weight: 700;
   text-align: left;
   line-height: 24px;
-  color: #343434;
+  color: ${({ type }) => (type === 'tertiary' ? '#9D9D9D' : '#343434')};
   margin: 5px;
 `;
 

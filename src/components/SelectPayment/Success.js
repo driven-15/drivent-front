@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { GoCheckCircleFill } from 'react-icons/go';
 import Typography from '@material-ui/core/Typography';
 
