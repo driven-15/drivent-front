@@ -11,7 +11,7 @@ import DayCard from '../../../components/DayCard';
 import ActivitiesCard from '../../../components/ActivitiesCard';
 
 export default function Activities() {
-  const [selectedAct, setSelectedAct] = useState(null);
+  const [selectedAct, setSelectedAct] = useState();
   const [selectedDay, setSelectedDay] = useState(null);
   const [dayActivities, setDayActivities] = useState([]);
   const [payment, setPayment] = useState(false);

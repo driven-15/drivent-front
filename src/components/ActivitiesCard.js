@@ -16,10 +16,10 @@ export default function ActivitiesCard({ type, id, width, title, capacity, start
 
   async function selectActivity() {
     try {
-      const body = id;
+      const body = { 'id': id };
       await postActivities(body, token);
     } catch (error) {
-      return toast('Erro ao escolher o a atividade');
+      //return toast('Erro ao escolher o a atividade');
     }
   }
 
@@ -41,7 +41,7 @@ export default function ActivitiesCard({ type, id, width, title, capacity, start
             <Capacity capacity={capacity}>Esgotado</Capacity>
           </>
           : <>
-            <Image src={available} alt="foto hotel" onClick={selectActivity()}/>
+            <Image src={available} alt="foto hotel" onClick={() => selectActivity()}/>
             <Capacity capacity={capacity}>{capacity} vagas </Capacity>
           </>
         }
